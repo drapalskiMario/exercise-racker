@@ -12,4 +12,14 @@ const createUser = async (req, res) => {
   }
 }
 
-module.exports = { createUser }
+const selectAllUsers = async (req, res) => {
+  try {
+    const users = await User.find()
+    res.json(users)
+  } catch (err) {
+    res.end()
+    console.error('err =>', err)
+  }
+}
+
+module.exports = { createUser, selectAllUsers }

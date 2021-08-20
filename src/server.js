@@ -8,7 +8,7 @@ const app = express()
 app.use(cors())
 app.use(express.static(__dirname + '/public'))
 app.use(express.urlencoded())
-app.use('/api', router)
+app.use(router)
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
