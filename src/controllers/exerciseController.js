@@ -1,4 +1,5 @@
-const { Exercise } = require("../models/exercise")
+const { Exercise } = require("../models/Exercise")
+const { User } = require("../models/User")
 
 const createExercise = async (req, res) => {
   try {
@@ -10,7 +11,11 @@ const createExercise = async (req, res) => {
 
     const exerciseSaved = new Exercise(exerciseObj)
     const result = await exerciseSaved.save()
-    res.json(result)
+    const user = await User.findOne({ _id })
+    res.json({
+      '_id': user._id, 'username': user.username, 'description': result.description, 'duration': result.duration,
+      'date': result.date.toDateString()
+    })
   } catch (err) {
     res.end()
     console.error('err =>', err)

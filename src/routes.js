@@ -10,7 +10,6 @@ router.get('/', (req, res) => {
 
 router.post('/api/users', createUser)
 router.get('/api/users', selectAllUsers)
-
 router.post('/api/users/:_id/exercises', createExercise)
 
 module.exports = router
