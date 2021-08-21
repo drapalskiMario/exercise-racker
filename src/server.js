@@ -13,6 +13,6 @@ app.use(router)
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 app.listen(process.env.PORT || 3000, () => {
-  console.log('Database connected and server running', __dirname)
+  console.log('Database connected and server running')
 })
 
