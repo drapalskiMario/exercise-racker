@@ -28,7 +28,7 @@ const addExercisesInUser = async (req, res) => {
     const { _id } = req.params
 
     const exerciseObj = { description, duration, date }
-    if (!date) { 
+    if (!date) {
       exerciseObj.date = new Date()
     } else {
       exerciseObj.date = new Date(exerciseObj.date)
@@ -52,7 +52,117 @@ const selectExercisesByUserId = async (req, res) => {
     const userId = req.params['_id']
     const userExercises = await UserExercises.findOne({ _id: userId })
     const { _id, username, log, count } = userExercises
-    res.json({ _id, username, log, count })
+
+    if (req.query.from && req.query.to && req.query.limit) {
+      let { from, to, limit } = req.query
+      from = new Date(from)
+      to = new Date(to)
+      const logsFilter = userExercises.log
+        .filter(({ date }) => date.getTime() >= from.getTime())
+        .filter(({ date }) => date.getTime() <= to.getTime())
+        .slice(0, Number(limit))
+        .map(({ description, duration, date }) => ({
+          description,
+          duration,
+          'date': date.toDateString()
+        }))
+
+      res.json({
+        _id, username, from: from.toDateString(), to: to.toDateString(),
+        count: logsFilter.length, log: logsFilter
+      })
+    }
+
+    if (req.query.from && req.query.to && !req.query.limit) {
+      let { from, to } = req.query
+      from = new Date(from)
+      to = new Date(to)
+      const logsFilter = userExercises.log
+        .filter(({ date }) => date.getTime() >= from.getTime())
+        .filter(({ date }) => date.getTime() <= to.getTime())
+        .map(({ description, duration, date }) => ({
+          description,
+          duration,
+          'date': date.toDateString()
+        }))
+
+      res.json({
+        _id, username, from: from.toDateString(), to: to.toDateString(),
+        count: logsFilter.length, log: logsFilter
+      })
+    }
+
+    if (req.query.from && !req.query.to && !req.query.limit) {
+      let { from } = req.query
+      from = new Date(from)
+      const logsFilter = userExercises.log
+        .filter(({ date }) => date.getTime() >= from.getTime())
+        .map(({ description, duration, date }) => ({
+          description,
+          duration,
+          'date': date.toDateString()
+        }))
+
+      res.json({
+        _id, username, from: from.toDateString(),
+        count: logsFilter.length, log: logsFilter
+      })
+    }
+
+    if (!req.query.from && req.query.to && req.query.limit) {
+      let { to, limit } = req.query
+      to = new Date(to)
+      const logsFilter = userExercises.log
+        .filter(({ date }) => date.getTime() <= to.getTime())
+        .slice(0, Number(limit))
+        .map(({ description, duration, date }) => ({
+          description,
+          duration,
+          'date': date.toDateString()
+        }))
+
+      res.json({
+        _id, username, to: to.toDateString(),
+        count: logsFilter.length, log: logsFilter
+      })
+    }
+
+    if (!req.query.from && req.query.to && !req.query.limit) {
+      let { to } = req.query
+      to = new Date(to)
+      const logsFilter = userExercises.log
+        .filter(({ date }) => date.getTime() <= to.getTime())
+        .map(({ description, duration, date }) => ({
+          description,
+          duration,
+          'date': date.toDateString()
+        }))
+
+      res.json({
+        _id, username, to: to.toDateString(),
+        count: logsFilter.length, log: logsFilter
+      })
+    }
+
+    if (!req.query.from && !req.query.to && req.query.limit) {
+      let { limit } = req.query
+      const logsFilter = userExercises.log
+        .slice(0, Number(limit))
+        .map(({ description, duration, date }) => ({
+          description,
+          duration,
+          'date': date.toDateString()
+        }))
+
+      res.json({
+        _id, username, count: logsFilter.length, log: logsFilter
+      })
+    }
+
+    if (!req.query.from && !req.query.to && !req.query.limit) {
+      res.json({ _id, username, count, log })
+    }
+
   } catch (err) {
     res.end()
     console.error('err =>', err)
